@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block content %}
+<h1><b>Add Letter</b></h1>
+<form action="{{ url_for('letterspost') }}" method="post">
+  <input value="" type="text" name="lettercode" placeholder="CODE">
+  <input value="" type="text" name="lettername" placeholder="Name">
+  <button type="submit">add</button>
+</form>
+<h1><b>All Letters</b></h1>
+<ol>
+  {% for letter in letters %}
+  <li><a href="{{ url_for('letterget',letterid=letter.id) }}">{{ letter.name }}</a></li>
+  {% endfor %}
+</ol>
+{% endblock %}

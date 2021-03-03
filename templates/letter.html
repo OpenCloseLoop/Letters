@@ -1,0 +1,65 @@
+{% extends "index.html" %}
+{% block content %}
+<h1>{{ letter.name }}</h1>
+<form action="{{ url_for('letterpost', letterid=letter.id) }}" method="post">
+  <input type="hidden" name="create">
+  <input type="number" name="paragraphno" placeholder="Paragraph No">
+  <input type="number" name="option" placeholder="Option No">
+  <textarea name="paragraphtext" placeholder="Enter paragraph text" rows="5" cols="50"></textarea>
+  <button type="submit">add</button>
+</form>
+<ul>
+  {% for content in contents %}
+  <li>{{ content.id }}:{{ content.letter_id }}</li>
+  <form action="{{ url_for('letterpost', letterid=letter.id) }}" method="post">
+    <input value="{{ content.id }}" type="hidden" name="delete">
+    <button type="submit">delete</button>
+  </form>
+  <form action="{{ url_for('letterpost', letterid=letter.id) }}" method="post">
+    <input value="{{ content.id }}" type="hidden" name="update">
+    <input value="{{ content.paragraph_no }}" type="number" name="newno">
+    <input value="{{ content.option }}" type="number" name="newoption"> 
+    <textarea name="newtext" rows="3" cols="100" onclick="auto_grow(this)">{{ content.paragraph_text }}</textarea>
+    <button type="submit">update</button>
+  </form>
+  {% endfor %}
+</ul>
+<div>
+  <h1>Table(s)</h1>
+    <form action="{{ url_for('tablepost', letterid=letter.id) }}" method="post">
+      <input type="hidden" name="create">
+      <input type="number" name="tableno" placeholder="Table No">
+      <input type="number" name="tablerow" placeholder="Row No">
+      <input type="number" name="tablecol" placeholder="Column No">
+      <button type="submit">add</button>
+    </form>
+{% if tables %}
+  {% for x in table_nos["table_no"] %}
+    Table No: {{ x }}
+    
+    {% for y in table_nos["row"] %}
+      <form action="{{ url_for('tablerowpost', letterid=letter.id) }}" method="post">
+        {% for z in table_nos["col"] %}
+          {% for table in tables %}
+            {% if table.table_no == x and table.row == y and table.col == z %}
+              {{ table.row }}:{{ table.col }}
+              {% if table.col == 0 %}
+                <button type="submit" name="update">update</button>
+                <button type="submit" name="delete">delete</button>
+              {% endif %}
+              <input value="{{ table.table_no }}" type="hidden" name="tableno">
+              <input value="{{ table.row }}" type="hidden" name="rowno">
+              <input value="{{ table_nos["col"] }}" type="hidden" name="cols">
+              <input value="{{ table.detail }}" type="text" name="col{{ table.col }}">
+            {% endif %}
+          {% endfor %}
+        {% endfor %}      
+      </form>
+    {% endfor %}
+  {% endfor %}
+{% endif %} 
+</div>
+<div>
+  {% block table %} {% endblock %}
+</div>
+{% endblock %}

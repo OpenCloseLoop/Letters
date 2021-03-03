@@ -1,0 +1,12 @@
+{% extends "scripts.html" %}
+{% block index %}
+<div class="left-sidebar">
+  <h1>Letter</h1>
+  <form action="{{ url_for('lettersget') }}" method="get">
+    <button type="submit">+New</button>
+  </form>
+</div>
+<div class="maincontent">
+  {% block content %} {% endblock %}
+</div>
+{% endblock %}

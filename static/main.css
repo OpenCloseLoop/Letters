@@ -1,0 +1,15 @@
+div {
+  border-style:dotted;
+  border-width:1px;
+  }
+
+html, body {
+  marginL 0;
+  height: 100%;
+  width: 100%;
+  }
+
+textarea {
+  width: 50vw;
+  height: 25vh;
+  }
