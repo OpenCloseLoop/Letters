@@ -37,17 +37,24 @@ def letterget(letterid):
     letter = Letter.query.filter_by(id=letterid).first()
     contents = Content.query.filter_by(letter_id=letterid).order_by(Content.paragraph_no,Content.option).all()
     tables = LetterTable.query.filter_by(letter_id=letterid).order_by(LetterTable.table_no, LetterTable.row, LetterTable.col).all()
-    t_no = set()
-    row = set()
-    col = set()
+    tables_info = []
+    t_nos = set() 
     for x in range(len(tables)):
-        t_no.add(tables[x].table_no)
-        row.add(tables[x].row)
-        col.add(tables[x].col)
-    table_nos = {  "table_no": t_no, "row": row, "col": col  }
+        t_nos.add(tables[x].table_no)
+    for t_no in t_nos:
+        table = LetterTable.query.filter_by(letter_id=letterid, table_no=t_no).order_by(LetterTable.row, LetterTable.col).all()
+        row = set()
+        col = set()
+        for y in range(len(table)):
+            row.add(table[y].row)
+            col.add(table[y].col)
+        table_dict = {  "no": t_no, "row": row, "col": col  } 
+        tables_info.append(table_dict)
+    #table_nos = {  "table_no": t_no, "row": row, "col": col  }
     if letter is None:
         return render_template('error.html', letters=letters)
-    return render_template('letter.html',letter=letter,contents=contents,tables=tables,table_nos=table_nos)
+    return str(tables_info["no"])
+   # return render_template('letter.html',letter=letter,contents=contents,tables=tables,table_nos=tables_info)
 
 @app.route("/letters/<int:letterid>", methods=['POST'])
 def letterpost(letterid):
@@ -84,15 +91,6 @@ def tablepost(letterid):
         rows = len(LetterTable.query.filter_by(letter_id=letterid, table_no=t_no).all())
         for row in range(rows):
             LetterTable.delete(table_no=t_no)
-    if 'update' in request.form:
-        t_no = int(request.form.get('update'))
-        rows = re.split(", ", request.form.get('rows').replace("{", "").replace("}", ""))
-        cols = re.split(", ", request.form.get('cols').replace("{", "").replace("}", ""))
-        for row in rows:
-            for col in cols:
-                detail = request.form.get("row"+row+"col"+col)
-                LetterTable.update(id=letterid, t_no=t_no, row=row, col=col, detail=detail) 
-        #return request.form
     return redirect(url_for('letterget', letterid=letterid))
 
 @app.route("/letters/tables/rows/<int:letterid>", methods=['POST'])
@@ -113,7 +111,7 @@ def tablerowpost(letterid):
         for col in cols:
             LetterTable.delete(table_no=t_no, row=rowno, col=col)
     if 'update' in request.form:
-        t_no = int(request.form.get('update'))
+        t_no = int(request.form.get('tableno'))
         row = int(request.form.get('rowno'))
         cols = request.form.get('cols').replace("{", "").replace("}", "")
         cols = re.split(", ", cols)

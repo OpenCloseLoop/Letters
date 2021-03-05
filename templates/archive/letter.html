@@ -33,7 +33,7 @@
       <input type="number" name="tablecol" placeholder="Column No">
       <button type="submit">add</button>
     </form>
-
+   
 {% if tables %}
   {% for x in table_nos["table_no"] %}
     <div>
@@ -41,29 +41,25 @@
       <form action="{{ url_for('tablepost', letterid=letter.id) }}" method="post">
         <button value={{ x }} type="submit" name="delete">deleteTable</button>
       </form>
-    </div>
-    <form action="{{ url_for('tablepost', letterid=letter.id) }}" method="post"> 
-      {% for y in table_nos["row"] %}
+    </div>  
+    {% for y in table_nos["row"] %}
+      <form action="{{ url_for('tablerowpost', letterid=letter.id) }}" method="post">
         {% for z in table_nos["col"] %}
           {% for table in tables %}
             {% if table.table_no == x and table.row == y and table.col == z %}
-              {% if loop.previtem %}
-                {% if loop.previtem['row'] != table.row %}
-                  <br>
-                {% endif %}
+              {% if table.col == 0 %}
+                <button type="submit" name="update">updateRow</button>
               {% endif %}  
               {{ table.row }}:{{ table.col }}
               <input value="{{ table.table_no }}" type="hidden" name="tableno">
-              <input value="{{ table_nos["row"] }}" type="hidden" name="rows">
+              <input value="{{ table.row }}" type="hidden" name="rowno">
               <input value="{{ table_nos["col"] }}" type="hidden" name="cols">
               <input value="{{ table.detail }}" type="text" name="row{{ table.row }}col{{ table.col }}">
             {% endif %}
           {% endfor %}
-        {% endfor %}
-      {% endfor %}
-      <br>
-      <button value={{ x }} type="submit" name="update">updateTable</button>
-    </form>
+        {% endfor %}      
+      </form>
+    {% endfor %}
   {% endfor %}
 {% endif %} 
 </div>

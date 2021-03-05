@@ -34,7 +34,7 @@ class Content(BaseMixin, db.Model):
     paragraph_text = db.Column(db.Text)
     db.UniqueConstraint(letter_id, paragraph_no, paragraph_text)
 
-    def update(row, p_no=None, opt=None, p_text=None):
+    def update(id, p_no=None, opt=None, p_text=None):
         obj = Content.query.filter_by(id=row).first()
         if p_no:
             obj.paragraph_no = p_no
@@ -65,14 +65,8 @@ class LetterTable(BaseMixin, db.Model):
     detail = db.Column(db.Text)
     db.UniqueConstraint(letter_id, table_no, row, col)
 
-    def update(id, t_no=None,row=None, col=None, detail=None):
-        obj = Content.query.filter_by(id=id).first()
-        if t_no:
-            obj.table_no = t_no
-        if row:
-            obj.row = row
-        if col:
-            obj.col = col
+    def update(id, t_no,row, col, detail=None):
+        obj = LetterTable.query.filter_by(letter_id=id, table_no=t_no, row=row, col=col).first()
         if detail:
             obj.detail = detail
         db.session.commit() 
