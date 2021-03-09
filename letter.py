@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for,Markup
 from models import *
 from flask_migrate import Migrate
 import re
+from sqlalchemy import func
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///letters.db'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///letters.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://wda:password@localhost/letters'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -45,9 +47,14 @@ def letterget(letterid):
         row.add(tables[x].row)
         col.add(tables[x].col)
     table_nos = {  "table_no": t_no, "row": row, "col": col  }
+    if tables is not None:
+        #htmlTable = db.session.execute(text("SELECT getTable(:l_id, :t_no)".execution_options(autocommit=True), l_id=letterid, t_no=1)
+        htmlTable = db.engine.execute(func.getTable(letterid,1)).first()
+        htmlTable = str(htmlTable[0]).replace(',','')
+        htmlTable = '<table>'+htmlTable+'</table>'
     if letter is None:
         return render_template('error.html', letters=letters)
-    return render_template('letter.html',letter=letter,contents=contents,tables=tables,table_nos=table_nos)
+    return render_template('letter.html',letter=letter,contents=contents,tables=tables,table_nos=table_nos, htmlTable=Markup(htmlTable))
 
 @app.route("/letters/<int:letterid>", methods=['POST'])
 def letterpost(letterid):
@@ -81,9 +88,8 @@ def tablepost(letterid):
                     LetterTable.create(letter_id=letterid, table_no=t_no, row=row, col=col)
     if 'delete' in request.form:
         t_no = int(request.form.get('delete'))
-        rows = len(LetterTable.query.filter_by(letter_id=letterid, table_no=t_no).all())
-        for row in range(rows):
-            LetterTable.delete(table_no=t_no)
+        LetterTable.query.filter_by(letter_id=letterid, table_no=t_no).delete()
+        db.session.commit()
     if 'update' in request.form:
         t_no = int(request.form.get('update'))
         rows = re.split(", ", request.form.get('rows').replace("{", "").replace("}", ""))

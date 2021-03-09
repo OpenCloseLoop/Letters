@@ -14,5 +14,8 @@ textarea {
   height: 10vh;
   }
 
-
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
 

@@ -8,9 +8,11 @@
   <textarea name="paragraphtext" placeholder="Enter paragraph text" rows="5" cols="50"></textarea>
   <button type="submit">add</button>
 </form>
-<ul>
-  {% for content in contents %}
-  <li>{{ content.id }}:{{ content.letter_id }}</li>
+<div>
+  <br>
+  <br>
+</div>
+{% for content in contents %}
   <form action="{{ url_for('letterpost', letterid=letter.id) }}" method="post">
     <input value="{{ content.id }}" type="hidden" name="delete">
     <button type="submit">delete</button>
@@ -22,8 +24,7 @@
     <textarea name="newtext" rows="3" cols="100" onclick="auto_grow(this)">{{ content.paragraph_text }}</textarea>
     <button type="submit">update</button>
   </form>
-  {% endfor %}
-</ul>
+{% endfor %}
 <div>
   <h1>Table(s)</h1>
     <form action="{{ url_for('tablepost', letterid=letter.id) }}" method="post">
@@ -68,6 +69,7 @@
 {% endif %} 
 </div>
 <div>
+  {{ htmlTable }}
   {% block table %} {% endblock %}
 </div>
 {% endblock %}

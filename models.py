@@ -32,7 +32,6 @@ class Content(BaseMixin, db.Model):
     paragraph_no = db.Column(db.Integer)
     option = db.Column(db.Integer)
     paragraph_text = db.Column(db.Text)
-    db.UniqueConstraint(letter_id, paragraph_no, paragraph_text)
 
     def update(id, p_no=None, opt=None, p_text=None):
         obj = Content.query.filter_by(id=row).first()
